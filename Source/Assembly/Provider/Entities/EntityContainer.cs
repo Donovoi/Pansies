@@ -11,47 +11,31 @@ using System.Management.Automation.Provider;
 using System.Text;
 namespace PoshCode.Pansies.Provider
 {
-    enum EntityType {
-        NerdFont,
-        Emoji,
-        EscapeSequences,
-        ExtendedCharacters
-    }
 
-    class EntityContainer : PathNodeBase
+    class EntityContainer : PathNodeBase, INewItem
     {
         private SortedList<string, string> items;
-        private EntityType Type;
+        private string name;
 
-        public EntityContainer(EntityType type)
+        public EntityContainer(string name, SortedList<string, string> entities)
         {
-            Type = type;
-            switch (type)
-            {
-                case EntityType.NerdFont:
-                    items = Entities.NerdFonts;
-                    break;
-                case EntityType.Emoji:
-                    items = Entities.Emoji;
-                    break;
-                case EntityType.EscapeSequences:
-                    items = Entities.EscapeSequences;
-                    break;
-                case EntityType.ExtendedCharacters:
-                    items = Entities.ExtendedCharacters;
-                    break;
-            }
+            this.name = name;
+            items = entities;
         }
 
         public override IPathValue GetNodeValue()
         {
-            return new ContainerPathValue(Type, Name);
+            return new ContainerPathValue(name, name);
         }
 
         public override string Name
         {
-            get { return Type.ToString(); }
+            get { return name; }
         }
+
+        public IEnumerable<string> NewItemTypeNames => ["Grapheme"];
+
+        public object NewItemParameters => null;
 
         public override IEnumerable<IPathNode> GetNodeChildren(IProviderContext providerContext)
         {
@@ -67,6 +51,14 @@ namespace PoshCode.Pansies.Provider
             } */ else {
                 return items.Where(i => i.Key == name).Select(i => new Grapheme(i));
             }
+        }
+
+        public IPathValue NewItem(IProviderContext providerContext, string path, string itemTypeName, object newItemValue)
+        {
+            var name = path.Split([Path.DirectorySeparatorChar], 2).LastOrDefault();
+            items.Add(name, newItemValue.ToString());
+
+            return new LeafPathValue(new Grapheme(name, newItemValue.ToString()), name);
         }
     }
 }

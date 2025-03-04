@@ -13,7 +13,7 @@ using PoshCode.Pansies;
 
 namespace PoshCode.Pansies.Provider
 {
-    public class Grapheme : PathNodeBase, IGetItemContent
+    public class Grapheme : PathNodeBase, IGetItemContent //, ISetItemContent
     {
         private string name;
         public string Value { get; set; }
