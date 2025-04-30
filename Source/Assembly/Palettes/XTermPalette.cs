@@ -15,14 +15,14 @@ namespace PoshCode.Pansies.Palettes
         {
             // Sixteen Console Colors
             Add(new RgbColor { R = 0x00, G = 0x00, B = 0x00 });
-                     
+
             Add(new RgbColor { R = 0x80, G = 0x00, B = 0x00 });
             Add(new RgbColor { R = 0x00, G = 0x80, B = 0x00 });
             Add(new RgbColor { R = 0x80, G = 0x80, B = 0x00 });
             Add(new RgbColor { R = 0x00, G = 0x00, B = 0x80 });
             Add(new RgbColor { R = 0x80, G = 0x00, B = 0x80 });
             Add(new RgbColor { R = 0x00, G = 0x80, B = 0x80 });
-                     
+
             Add(new RgbColor { R = 0xc0, G = 0xc0, B = 0xc0 });
             Add(new RgbColor { R = 0x80, G = 0x80, B = 0x80 });
 
@@ -59,7 +59,7 @@ namespace PoshCode.Pansies.Palettes
             for (var x = 0; x < 24; x++)
             {
                 Add(new RgbColor
-                { 
+                {
                     R = 0x8 + (0xA * x),
                     G = 0x8 + (0xA * x),
                     B = 0x8 + (0xA * x)

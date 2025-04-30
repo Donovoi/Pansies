@@ -13,15 +13,31 @@ namespace PoshCode.Pansies
     public partial class RgbColor : Rgb, IEquatable<RgbColor>
     {
         private int index = -1;
-        private static ConsolePalette _consolePalette;
+        private static TerminalPalette _terminalPalette;
         private static XTermPalette _xTermPalette;
         private static X11Palette _x11Palette;
+        private static ConsolePalette _consolePalette;
+        public static TerminalPalette TerminalPalette
+        {
+            get
+            {
+                if(null == _terminalPalette)
+                {
+                    _terminalPalette = new TerminalPalette();
+                }
+                return _terminalPalette;
+            }
+            set
+            {
+                _terminalPalette = value;
+            }
+        }
 
         public static ConsolePalette ConsolePalette
         {
             get
             {
-                if(null == _consolePalette)
+                if (null == _consolePalette)
                 {
                     _consolePalette = new ConsolePalette();
                 }
@@ -36,6 +52,11 @@ namespace PoshCode.Pansies
         public static void ResetConsolePalette()
         {
             _consolePalette = new ConsolePalette();
+        }
+
+        public static void ResetTerminalPalette()
+        {
+            _terminalPalette = new TerminalPalette();
         }
 
         public static XTermPalette XTermPalette
@@ -68,6 +89,7 @@ namespace PoshCode.Pansies
                 _x11Palette = value;
             }
         }
+
         #region private ctors (to be removed?)
         private RgbColor(byte xTerm256Index)
         {
@@ -98,6 +120,7 @@ namespace PoshCode.Pansies
             G = rgb[1];
             B = rgb[2];
         }
+        #endregion
 
         public RgbColor(int red, int green, int blue)
         {
@@ -106,22 +129,24 @@ namespace PoshCode.Pansies
             G = green;
             B = blue;
         }
-        #endregion
-
-        public RgbColor(X11ColorName colorName)
-        {
-            SetX11Color(colorName);
-        }
-
-        //public RgbColor(RgbColor color)
-        //{
-        //    _mode = color._mode;
-        //    RGB = color.RGB;
-        //}
 
         public RgbColor(ConsoleColor consoleColor)
         {
-            SetConsoleColor(consoleColor);
+            // The ConsoleColor and TerminalPalette are the same 16-color palette
+            // But ConsoleColor is in an order that doesn't match the escape sequence order
+            // So we just don't use it anymore directly, we convert to the TerminalPalette
+            RgbColor rgb = ConsolePalette[(int)consoleColor];
+            int found;
+            if ((found = TerminalPalette.IndexOf(rgb)) >= 0)
+            {
+                SetTerminalColor(found);
+            }
+            else
+            {
+                index = TerminalPalette.FindClosestColorIndex(rgb);
+                _mode = ColorMode.TerminalColor;
+                RGB = TerminalPalette[index].Value.RGB;
+            }
         }
 
         public RgbColor(byte red, byte green, byte blue)
@@ -172,7 +197,7 @@ namespace PoshCode.Pansies
             }
             color = color.Trim();
 
-            // handle #rrggbb hex strings like CSS colors ....
+            // handle #rrggbb or 0xrrggbb hex strings like CSS colors ....
             if (color[0] == '#' || (color[0] == '0' && (color[1] == 'x' || color[1] == 'X')))
             {
                 try
@@ -226,22 +251,22 @@ namespace PoshCode.Pansies
                 catch { }
             }
 
-            // It could be a named x11 COLOR
-            // NOTE: the IsDefined is necessary to prevent numerical strings from being parsed as ConsoleColor...
-            if (Enum.TryParse(color, true, out X11ColorName x11Color) && string.Equals(color, x11Color.ToString(), StringComparison.OrdinalIgnoreCase))
+            // It could be a named Terminal Color
+            int found;
+            if ((found = TerminalPalette.IndexOf(color)) >= 0)
             {
-                SetX11Color(x11Color);
-            }
-            else
-            {
-                throw new ArgumentException("Unrecognized color: '" + color + "' if you're not using an x11 color name, consider using #RRGGBB css-style colors");
+                SetTerminalColor(found);
+                return;
             }
 
-            // X11 Colors are also ConsoleColors, but we want ConsoleColor to win
-            if (Enum.TryParse(color, true, out ConsoleColor consoleColor) && string.Equals(color, consoleColor.ToString(), StringComparison.OrdinalIgnoreCase))
+            // It could be a named X11 Color
+            if ((found = X11Palette.IndexOf(color)) >= 0)
             {
-                SetConsoleColor(consoleColor);
+                SetX11Color(found);
+                return;
             }
+
+            throw new ArgumentException("Unrecognized color: '" + color + "' if you're not using an x11 color name, consider using #RRGGBB css-style colors");
         }
 
 
@@ -353,9 +378,14 @@ namespace PoshCode.Pansies
                 return new RgbColor((ConsoleColor)inputData);
             }
 
-            if (inputData is X11ColorName)
+            if (TerminalPalette.TryGetValue(inputData.ToString(), out RgbColor terminalColor))
             {
-                return new RgbColor((X11ColorName)inputData);
+                return new RgbColor(terminalColor);
+            }
+
+            if (X11Palette.TryGetValue(inputData.ToString(), out RgbColor x11Color))
+            {
+                return new RgbColor(x11Color);
             }
 
             if (inputData is string)
@@ -386,32 +416,39 @@ namespace PoshCode.Pansies
             return new RgbColor();
         }
 
-        private void SetConsoleColor(ConsoleColor color)
+        private void SetTerminalColor(int index)
         {
-            _mode = ColorMode.ConsoleColor;
-            index = (int)color;
-            RGB = ConsolePalette[index].RGB;
+            _mode = ColorMode.TerminalColor;
+            this.index = index;
+            RGB = TerminalPalette[index].Value.RGB;
         }
 
-        private void SetX11Color(X11ColorName color)
+        private void SetX11Color(int index)
         {
             _mode = ColorMode.X11;
-            index = (int)color;
-            RGB = X11Palette[index].RGB;
+            this.index = index;
+            RGB = X11Palette[index].Value.RGB;
         }
 
         /// <summary>
         /// The default ColorMode for the console
         /// </summary>
         // TODO: Detect from platform. Should default to RGB on Windows 10, use TERM on others
-        public static ColorMode ColorMode { get; set; } = ColorMode.Automatic;
-
-        public ColorMode Mode { get => _mode; set => _mode = value; }
+        public static ColorMode ColorMode { get => colorMode; set => colorMode = value; }
+        public ColorMode Mode
+        {
+            get
+            {
+                return colorMode;
+            }
+            set => _mode = value;
+        }
 
         /// <summary>
         /// An override mode for this color
         /// </summary>
         private ColorMode _mode = ColorMode.Automatic;
+        private static ColorMode colorMode = ColorMode.Automatic;
 
         public int RGB
         {
@@ -445,7 +482,7 @@ namespace PoshCode.Pansies
         {
             get
             {
-                if (_mode != ColorMode.ConsoleColor)
+                if (_mode != ColorMode.TerminalColor)
                 {
                     return (ConsoleColor)ConsolePalette.FindClosestColorIndex(this);
                 }
@@ -465,15 +502,15 @@ namespace PoshCode.Pansies
             }
         }
 
-        public X11ColorName X11ColorName
+        public string X11ColorName
         {
             get
             {
                 if (_mode != ColorMode.X11)
                 {
-                    return (X11ColorName)X11Palette.FindClosestColorIndex(this);
+                    return X11Palette.FindClosestColorName(this);
                 }
-                return (X11ColorName)index;
+                return X11Palette[index].Key;
             }
         }
 
@@ -506,11 +543,16 @@ namespace PoshCode.Pansies
             return hsl.To<RgbColor>();
         }
 
+
         public string ToVt(bool background = false, ColorMode? mode = null)
         {
             return ToVtEscapeSequence(background, mode);
         }
 
+        public override string ToVTEscapeSequence(bool background = false)
+        {
+            return string.Format(background ? "\u001B[48;2;{0:n0};{1:n0};{2:n0}m" : "\u001B[38;2;{0:n0};{1:n0};{2:n0}m", R, G, B);
+        }
         public string ToVtEscapeSequence(bool background = false, ColorMode? mode = null)
         {
             if (!mode.HasValue)
@@ -537,36 +579,36 @@ namespace PoshCode.Pansies
                     {
                         case ConsoleColor.Black:
                             return background ? "\u001B[40m" : "\u001B[30m";
-                        case ConsoleColor.Blue:
-                            return background ? "\u001B[104m" : "\u001B[94m";
-                        case ConsoleColor.Cyan:
-                            return background ? "\u001B[106m" : "\u001B[96m";
-                        case ConsoleColor.DarkBlue:
-                            return background ? "\u001B[44m" : "\u001B[34m";
-                        case ConsoleColor.DarkCyan:
-                            return background ? "\u001B[46m" : "\u001B[36m";
-                        case ConsoleColor.DarkGray:
-                            return background ? "\u001B[100m" : "\u001B[90m";
-                        case ConsoleColor.DarkGreen:
-                            return background ? "\u001B[42m" : "\u001B[32m";
-                        case ConsoleColor.DarkMagenta:
-                            return background ? "\u001B[45m" : "\u001B[35m";
                         case ConsoleColor.DarkRed:
                             return background ? "\u001B[41m" : "\u001B[31m";
+                        case ConsoleColor.DarkGreen:
+                            return background ? "\u001B[42m" : "\u001B[32m";
                         case ConsoleColor.DarkYellow:
                             return background ? "\u001B[43m" : "\u001B[33m";
+                        case ConsoleColor.DarkBlue:
+                            return background ? "\u001B[44m" : "\u001B[34m";
+                        case ConsoleColor.DarkMagenta:
+                            return background ? "\u001B[45m" : "\u001B[35m";
+                        case ConsoleColor.DarkCyan:
+                            return background ? "\u001B[46m" : "\u001B[36m";
                         case ConsoleColor.Gray:
                             return background ? "\u001B[47m" : "\u001B[37m";
-                        case ConsoleColor.Green:
-                            return background ? "\u001B[102m" : "\u001B[92m";
-                        case ConsoleColor.Magenta:
-                            return background ? "\u001B[105m" : "\u001B[95m";
+                        case ConsoleColor.DarkGray:
+                            return background ? "\u001B[100m" : "\u001B[90m";
                         case ConsoleColor.Red:
                             return background ? "\u001B[101m" : "\u001B[91m";
-                        case ConsoleColor.White:
-                            return background ? "\u001B[107m" : "\u001B[97m";
+                        case ConsoleColor.Green:
+                            return background ? "\u001B[102m" : "\u001B[92m";
                         case ConsoleColor.Yellow:
                             return background ? "\u001B[103m" : "\u001B[93m";
+                        case ConsoleColor.Blue:
+                            return background ? "\u001B[104m" : "\u001B[94m";
+                        case ConsoleColor.Magenta:
+                            return background ? "\u001B[105m" : "\u001B[95m";
+                        case ConsoleColor.Cyan:
+                            return background ? "\u001B[106m" : "\u001B[96m";
+                        case ConsoleColor.White:
+                            return background ? "\u001B[107m" : "\u001B[97m";
                         default:
                             return background ? "\u001B[49m" : "\u001B[39m";
                     }

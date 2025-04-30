@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- *******************************************************************
-This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
-******************************************************************** -->
 <Configuration>
   <SelectionSets>
     <SelectionSet>
@@ -18,8 +15,59 @@ This is Joel "Jaykul" Bennett's coloring format file for PowerShell 5.1
         <TypeName>PoshCode.Pansies.ColorSpaces.ColorSpace</TypeName>
       </Types>
     </SelectionSet>
+    <SelectionSet>
+      <Name>Grapheme</Name>
+      <Types>
+        <TypeName>PoshCode.Pansies.Provider.Grapheme</TypeName>
+      </Types>
+    </SelectionSet>
   </SelectionSets>
   <ViewDefinitions>
+    <View>
+      <Name>Grapheme</Name>
+      <ViewSelectedBy>
+        <SelectionSetName>Grapheme</SelectionSetName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Width>50</Width>
+            <Label>Name</Label>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Entity</Label>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Value</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>Grapheme</Name>
+      <ViewSelectedBy>
+        <SelectionSetName>Grapheme</SelectionSetName>
+      </ViewSelectedBy>
+      <WideControl>
+        <WideEntries>
+          <WideEntry>
+            <WideItem>
+              <PropertyName>Value</PropertyName>
+            </WideItem>
+          </WideEntry>
+        </WideEntries>
+      </WideControl>
+    </View>
+
     <View>
       <Name>Text</Name>
       <ViewSelectedBy>

@@ -459,6 +459,7 @@ namespace PoshCode.Pansies
             ["custom-common_lisp"] = "\U0000e6b0", // 
             ["custom-cpp"] = "\U0000e61d", // 
             ["custom-crystal"] = "\U0000e62f", // 
+            ["custom-css"] = "\U0000e6b8", // 
             ["custom-default"] = "\U0000e612", // 
             ["custom-electron"] = "\U0000e62e", // 
             ["custom-elixir"] = "\U0000e62d", // 
@@ -999,6 +1000,18 @@ namespace PoshCode.Pansies
             ["dev-yunohost"] = "\U0000e8ee", // 
             ["dev-zend"] = "\U0000e778", // 
             ["dev-zig"] = "\U0000e8ef", // 
+            ["extra-progress_empty_left"] = "\U0000ee00", // 
+            ["extra-progress_empty_mid"] = "\U0000ee01", // 
+            ["extra-progress_empty_right"] = "\U0000ee02", // 
+            ["extra-progress_full_left"] = "\U0000ee03", // 
+            ["extra-progress_full_mid"] = "\U0000ee04", // 
+            ["extra-progress_full_right"] = "\U0000ee05", // 
+            ["extra-progress_spinner_1"] = "\U0000ee06", // 
+            ["extra-progress_spinner_2"] = "\U0000ee07", // 
+            ["extra-progress_spinner_3"] = "\U0000ee08", // 
+            ["extra-progress_spinner_4"] = "\U0000ee09", // 
+            ["extra-progress_spinner_5"] = "\U0000ee0a", // 
+            ["extra-progress_spinner_6"] = "\U0000ee0b", // 
             ["fa-500px"] = "\U0000f26e", // 
             ["fa-accessible_icon"] = "\U0000f29b", // 
             ["fa-accusoft"] = "\U0000f0b7", // 

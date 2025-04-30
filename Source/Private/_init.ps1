@@ -85,4 +85,13 @@ $global:PansiesColorCompleterRegistration = Register-EngineEvent -SourceIdentifi
     Remove-Variable PansiesColorCompleterRegistration -Scope global
 }
 
-Export-ModuleMember -Variable RgbColorCompleter -Function *-* -Cmdlet * -Alias *
+$Pansies = @{
+    color = [RgbColor]::X11Palette
+    esc   = [PoshCode.Pansies.Entities]::EscapeSequences
+    nf    = [PoshCode.Pansies.Entities]::NerdFontSymbols
+    emoji = [PoshCode.Pansies.Entities]::Emoji
+    extra = [PoshCode.Pansies.Entities]::ExtendedCharacters
+}
+
+
+Export-ModuleMember -Variable Pansies, RgbColorCompleter -Function *-* -Cmdlet * -Alias *

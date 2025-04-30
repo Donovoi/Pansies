@@ -49,7 +49,7 @@ FunctionsToExport = @()
 CmdletsToExport = @('New-Text', 'New-Hyperlink', 'Write-Host', 'Get-Gradient', 'Get-Complement', 'Get-ColorWheel')
 
 # Variables to export from this module
-VariablesToExport = 'RgbColorCompleter'
+VariablesToExport = 'RgbColorCompleter', 'Pansies'
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
 AliasesToExport = 'Text', 'Url'

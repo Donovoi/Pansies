@@ -41,6 +41,13 @@ namespace PoshCode.Pansies.ColorSpaces
         /// Array of signifigant values in a consistent order. Useful for generic n-dimensional math.
         /// </summary>
         double[] Ordinals { get; set; }
+
+        /// <summary>
+        /// Convert the color space to a virtual terminal RGB escape sequence
+        /// </summary>
+        /// <param name="background">If true, use ESC 48, otherwise use ESC 38</param>
+        /// <returns>ESC [ 48 ; 2 ; R ; G ; B m</returns>
+        string ToVTEscapeSequence(bool background = false);
     }
 
     /// <summary>
@@ -106,6 +113,27 @@ namespace PoshCode.Pansies.ColorSpaces
             T start = new T();
             start.Initialize(ToRgb());
             return Gradient.GetGradient(start, end, size).ToArray();
+        }
+
+        /// <summary>
+        /// Convert the color space to a virtual terminal RGB foreground color escape sequence
+        /// </summary>
+        public string Fg => ToVTEscapeSequence(false);
+
+        /// <summary>
+        /// Convert the color space to a virtual terminal RGB background color escape sequence
+        /// </summary>
+        public string Bg => ToVTEscapeSequence(true);
+
+        /// <summary>
+        /// Convert the color space to a virtual terminal RGB escape sequence
+        /// </summary>
+        /// <param name="background">If true, use ESC 48, otherwise use ESC 38</param>
+        /// <returns>ESC [ 48 ; 2 ; R ; G ; B m</returns>
+        public virtual string ToVTEscapeSequence(bool background = false)
+        {
+            var rgb = ToRgb();
+            return string.Format(background ? "\u001B[48;2;{0:n0};{1:n0};{2:n0}m" : "\u001B[38;2;{0:n0};{1:n0};{2:n0}m", rgb.R, rgb.G, rgb.B);
         }
     }
 }

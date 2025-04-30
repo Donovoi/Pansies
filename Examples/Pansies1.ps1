@@ -1,0 +1,34 @@
+@"
+Foreground.Black                  : ${fg:Black}``e[30m${fg:clear}
+Foreground.DarkGray               : ${fg:DarkGray}``e[90m${fg:clear}
+Foreground.White                  : ${fg:White}``e[37m${fg:clear}
+Foreground.Gray                   : ${fg:Gray}``e[97m${fg:clear}
+Foreground.Red                    : ${fg:Red}``e[31m${fg:clear}
+Foreground.DarkRed                : ${fg:DarkRed}``e[91m${fg:clear}
+Foreground.Magenta                : ${fg:Magenta}``e[35m${fg:clear}
+Foreground.DarkMagenta            : ${fg:DarkMagenta}``e[95m${fg:clear}
+Foreground.Blue                   : ${fg:Blue}``e[34m${fg:clear}
+Foreground.DarkBlue               : ${fg:DarkBlue}``e[94m${fg:clear}
+Foreground.Cyan                   : ${fg:Cyan}``e[36m${fg:clear}
+Foreground.DarkCyan               : ${fg:DarkCyan}``e[96m${fg:clear}
+Foreground.Green                  : ${fg:Green}``e[32m${fg:clear}
+Foreground.DarkGreen              : ${fg:DarkGreen}``e[92m${fg:clear}
+Foreground.Yellow                 : ${fg:Yellow}``e[33m${fg:clear}
+Foreground.DarkYellow             : ${fg:DarkYellow}``e[93m${fg:clear}
+Background.Black                  : ${bg:Black}``e[40m${bg:clear}
+Background.DarkGray               : ${bg:DarkGray}``e[100m${bg:clear}
+Background.White                  : ${bg:White}``e[47m${bg:clear}
+Background.Gray                   : ${bg:Gray}``e[107m${bg:clear}
+Background.Red                    : ${bg:Red}``e[41m${bg:clear}
+Background.DarkRed                : ${bg:DarkRed}``e[101m${bg:clear}
+Background.Magenta                : ${bg:Magenta}``e[45m${bg:clear}
+Background.DarkMagenta            : ${bg:DarkMagenta}``e[105m${bg:clear}
+Background.Blue                   : ${bg:Blue}``e[44m${bg:clear}
+Background.DarkBlue               : ${bg:DarkBlue}``e[104m${bg:clear}
+Background.Cyan                   : ${bg:Cyan}``e[46m${bg:clear}
+Background.DarkCyan               : ${bg:DarkCyan}``e[106m${bg:clear}
+Background.Green                  : ${bg:Green}``e[42m${bg:clear}
+Background.DarkGreen              : ${bg:DarkGreen}``e[102m${bg:clear}
+Background.Yellow                 : ${bg:Yellow}``e[43m${bg:clear}
+Background.DarkYellow             : ${bg:DarkYellow}``e[103m${bg:clear}
+"@

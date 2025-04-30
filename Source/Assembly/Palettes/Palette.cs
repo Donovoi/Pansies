@@ -63,13 +63,13 @@ namespace PoshCode.Pansies.Palettes
             nativeColors.CopyTo(array, arrayIndex);
         }
 
-        public struct FindResult<C>
+        public struct FindResult<TColor>
         {
             public int Index;
             public double Distance;
-            public C Color;
+            public TColor Color;
 
-            public FindResult(int index, double distance, C color)
+            public FindResult(int index, double distance, TColor color)
             {
                 Index = index;
                 Distance = distance;
@@ -99,7 +99,7 @@ namespace PoshCode.Pansies.Palettes
         {
             return FindClosestColor<T>(color).Color;
         }
-        
+
 
         public int FindClosestColorIndex(IColorSpace color)
         {
@@ -127,8 +127,6 @@ namespace PoshCode.Pansies.Palettes
 
         public bool Remove(T item)
         {
-
-
             var index = nativeColors.IndexOf(item);
             if (index >= 0)
             {
