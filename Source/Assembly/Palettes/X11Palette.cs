@@ -8,7 +8,7 @@ using PoshCode.Pansies.Palettes;
 
 namespace PoshCode.Pansies.Palettes
 {
-    public class X11Palette : NamedPalette<RgbColor>, IArgumentCompleter
+    public class X11Palette : NamedPalette<RgbColor>
     {
         public X11Palette()
         {

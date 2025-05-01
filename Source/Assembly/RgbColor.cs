@@ -122,13 +122,15 @@ namespace PoshCode.Pansies
         }
         #endregion
 
-        public RgbColor(int red, int green, int blue)
+        public RgbColor(int red, int green, int blue, ColorMode mode = ColorMode.Rgb24Bit)
         {
-            _mode = ColorMode.Rgb24Bit;
+            _mode = mode;
             R = red;
             G = green;
             B = blue;
         }
+
+        public RgbColor(int red, int green, int blue) : this(red, green, blue, ColorMode.Rgb24Bit) {}
 
         public RgbColor(ConsoleColor consoleColor)
         {
@@ -158,6 +160,25 @@ namespace PoshCode.Pansies
         public RgbColor(string color)
         {
             FromPsMetadata(color);
+        }
+
+        public RgbColor(IColorSpace colorSpace)
+        {
+            if (colorSpace == null)
+            {
+                throw new ArgumentNullException(nameof(colorSpace), "Color space cannot be null.");
+            }
+
+            if (colorSpace is RgbColor rgbColor)
+            {
+                _mode = rgbColor._mode;
+                index = rgbColor.index;
+                RGB = rgbColor.RGB;
+            }
+            else
+            {
+                Initialize(colorSpace.ToRgb());
+            }
         }
 
         public string ToString(bool AsOrdinal = false)
@@ -377,22 +398,6 @@ namespace PoshCode.Pansies
             {
                 return new RgbColor((ConsoleColor)inputData);
             }
-
-            if (TerminalPalette.TryGetValue(inputData.ToString(), out RgbColor terminalColor))
-            {
-                return new RgbColor(terminalColor);
-            }
-
-            if (X11Palette.TryGetValue(inputData.ToString(), out RgbColor x11Color))
-            {
-                return new RgbColor(x11Color);
-            }
-
-            if (inputData is string)
-            {
-                return new RgbColor(inputData.ToString());
-            }
-
             if (inputData is byte)
             {
                 return new RgbColor((byte)inputData);
@@ -411,6 +416,25 @@ namespace PoshCode.Pansies
             if (inputData is byte[])
             {
                 return new RgbColor(((byte[])inputData)[0], ((byte[])inputData)[1], ((byte[])inputData)[2]);
+            }
+
+            if (inputData is IColorSpace) {
+                return new RgbColor((IColorSpace)inputData);
+            }
+
+            if (inputData is string)
+            {
+                return new RgbColor(inputData.ToString());
+            }
+
+            if (TerminalPalette.TryGetValue(inputData.ToString(), out RgbColor terminalColor))
+            {
+                return new RgbColor(terminalColor);
+            }
+
+            if (X11Palette.TryGetValue(inputData.ToString(), out RgbColor x11Color))
+            {
+                return new RgbColor(x11Color);
             }
 
             return new RgbColor();
@@ -439,7 +463,7 @@ namespace PoshCode.Pansies
         {
             get
             {
-                return colorMode;
+                return _mode;
             }
             set => _mode = value;
         }
@@ -448,7 +472,7 @@ namespace PoshCode.Pansies
         /// An override mode for this color
         /// </summary>
         private ColorMode _mode = ColorMode.Automatic;
-        private static ColorMode colorMode = ColorMode.Automatic;
+        [ThreadStatic] private static ColorMode colorMode = ColorMode.Automatic;
 
         public int RGB
         {
@@ -482,11 +506,14 @@ namespace PoshCode.Pansies
         {
             get
             {
-                if (_mode != ColorMode.TerminalColor)
-                {
-                    return (ConsoleColor)ConsolePalette.FindClosestColorIndex(this);
-                }
-                return (ConsoleColor)index;
+                return (ConsoleColor)ConsolePalette.FindClosestColorIndex(this);
+            }
+        }
+        public string TerminalColor
+        {
+            get
+            {
+                return TerminalPalette.FindClosestColorName(this);
             }
         }
 
@@ -557,13 +584,13 @@ namespace PoshCode.Pansies
         {
             if (!mode.HasValue)
             {
-                if (RgbColor.ColorMode != ColorMode.Automatic)
-                {
-                    mode = RgbColor.ColorMode;
-                }
-                else if(_mode != ColorMode.Automatic)
+                if(_mode != ColorMode.Automatic)
                 {
                     mode = _mode;
+                }
+                else if(ColorMode != ColorMode.Automatic)
+                {
+                    mode = ColorMode;
                 }
                 else
                 {
@@ -573,41 +600,41 @@ namespace PoshCode.Pansies
 
             switch (mode.Value)
             {
-                case ColorMode.ConsoleColor:
+                case ColorMode.TerminalColor:
                 {
-                    switch (this.ConsoleColor)
+                    switch (TerminalColor)
                     {
-                        case ConsoleColor.Black:
+                        case "Black":
                             return background ? "\u001B[40m" : "\u001B[30m";
-                        case ConsoleColor.DarkRed:
+                        case "Red":
                             return background ? "\u001B[41m" : "\u001B[31m";
-                        case ConsoleColor.DarkGreen:
+                        case "Green":
                             return background ? "\u001B[42m" : "\u001B[32m";
-                        case ConsoleColor.DarkYellow:
+                        case "Yellow":
                             return background ? "\u001B[43m" : "\u001B[33m";
-                        case ConsoleColor.DarkBlue:
+                        case "Blue":
                             return background ? "\u001B[44m" : "\u001B[34m";
-                        case ConsoleColor.DarkMagenta:
+                        case "Magenta":
                             return background ? "\u001B[45m" : "\u001B[35m";
-                        case ConsoleColor.DarkCyan:
+                        case "Cyan":
                             return background ? "\u001B[46m" : "\u001B[36m";
-                        case ConsoleColor.Gray:
+                        case "White":
                             return background ? "\u001B[47m" : "\u001B[37m";
-                        case ConsoleColor.DarkGray:
+                        case "BrightBlack":
                             return background ? "\u001B[100m" : "\u001B[90m";
-                        case ConsoleColor.Red:
+                        case "BrightRed":
                             return background ? "\u001B[101m" : "\u001B[91m";
-                        case ConsoleColor.Green:
+                        case "BrightGreen":
                             return background ? "\u001B[102m" : "\u001B[92m";
-                        case ConsoleColor.Yellow:
+                        case "BrightYellow":
                             return background ? "\u001B[103m" : "\u001B[93m";
-                        case ConsoleColor.Blue:
+                        case "BrightBlue":
                             return background ? "\u001B[104m" : "\u001B[94m";
-                        case ConsoleColor.Magenta:
+                        case "BrightMagenta":
                             return background ? "\u001B[105m" : "\u001B[95m";
-                        case ConsoleColor.Cyan:
+                        case "BrightCyan":
                             return background ? "\u001B[106m" : "\u001B[96m";
-                        case ConsoleColor.White:
+                        case "BrightWhite":
                             return background ? "\u001B[107m" : "\u001B[97m";
                         default:
                             return background ? "\u001B[49m" : "\u001B[39m";
@@ -625,7 +652,7 @@ namespace PoshCode.Pansies
                 {
                     if (RGB < 0)
                     {
-                        return string.Empty;
+                        return background ? "\u001B[49m" : "\u001B[39m";
                     }
 
                     var format = string.Format(background ? "\u001B[48;2;{0:n0};{1:n0};{2:n0}m" : "\u001B[38;2;{0:n0};{1:n0};{2:n0}m", R, G, B);

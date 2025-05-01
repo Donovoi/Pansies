@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -12,22 +13,20 @@ namespace PoshCode.Pansies.Palettes
 {
     public class NamedPalette<T> : Palette<T>, IReadOnlyDictionary<string, T>, IArgumentCompleter where T : IColorSpace, new()
     {
-        private IList<string> names = new List<string>();
+        private List<string> names = new List<string>();
 
         public IEnumerable<CompletionResult> CompleteArgument(string commandName, string parameterName, string wordToComplete, CommandAst commandAst, IDictionary fakeBoundParameters)
         {
             WildcardPattern wildcard = new WildcardPattern(wordToComplete + "*", WildcardOptions.IgnoreCase);
 
-            foreach (var name in Keys.Where(s => wildcard.IsMatch(s.ToString())))
+            foreach (var name in names.Where(wildcard.IsMatch))
             {
-                yield return new CompletionResult(name.ToString(), dictionary[name].ToVTEscapeSequence(true) + " \u001B[0m " + name.ToString(), CompletionResultType.ParameterValue, name.ToString());
+                yield return new CompletionResult(name.ToString(), nativeColors[names.IndexOf(name)].ToVTEscapeSequence(true) + " \u001B[0m " + name, CompletionResultType.ParameterValue, name);
             }
         }
 
-        private readonly IDictionary<string, T> dictionary;
         public NamedPalette()
         {
-            dictionary = new Dictionary<string, T>();
         }
 
         public NamedPalette(IColorSpaceComparison comparisonAlgorithm) : this()
@@ -42,18 +41,8 @@ namespace PoshCode.Pansies.Palettes
             Add(value);
         }
 
-        public virtual bool ContainsKey(string key) => names.Contains(key);
+        public virtual bool ContainsKey(string key) => names.Contains(key, StringComparer.OrdinalIgnoreCase);
 
-        public virtual bool TryGetValue(string key, out T value) {
-            var index = names.IndexOf(key);
-            if (index >= 0)
-            {
-                value = nativeColors[index];
-                return true;
-            }
-            value = default;
-            return false;
-        }
 
         // public virtual void Add(KeyValuePair<string, T> items) => dictionary.Add(items);
 
@@ -83,15 +72,14 @@ namespace PoshCode.Pansies.Palettes
             }
         }
 
-        public int IndexOf(string key) => names.IndexOf(key);
-
+        public int IndexOf(string key) => names.FindIndex(x => x.Equals(key, StringComparison.OrdinalIgnoreCase));
         public string FindClosestColorName(IColorSpace color)
         {
             return names[FindClosestColor<T>(color).Index];
         }
 
         public T GetValue(string key) {
-            var index = names.IndexOf(key);
+            var index = IndexOf(key);
             if (index >= 0)
             {
                 return nativeColors[index];
@@ -116,7 +104,7 @@ namespace PoshCode.Pansies.Palettes
         }
         public virtual bool Remove(string key)
         {
-            var index = names.IndexOf(key);
+            var index = IndexOf(key);
             if (index >= 0) {
                 ((Palette<T>)this).RemoveAt(index);
                 names.RemoveAt(index);
@@ -130,14 +118,20 @@ namespace PoshCode.Pansies.Palettes
             names.RemoveAt(index);
         }
 
-        bool IReadOnlyDictionary<string, T>.ContainsKey(string key)
-        {
-            throw new System.NotImplementedException();
-        }
+        bool IReadOnlyDictionary<string, T>.ContainsKey(string key) => ContainsKey(key);
 
-        bool IReadOnlyDictionary<string, T>.TryGetValue(string key, out T value)
+        bool IReadOnlyDictionary<string, T>.TryGetValue(string key, out T value) => TryGetValue(key, out value);
+
+        public virtual bool TryGetValue(string key, out T value)
         {
-            throw new System.NotImplementedException();
+            var index = IndexOf(key);
+            if (index >= 0)
+            {
+                value = nativeColors[index];
+                return true;
+            }
+            value = default;
+            return false;
         }
 
         new public KeyValuePair<string,T> this[int index]

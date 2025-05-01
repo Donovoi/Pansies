@@ -10,22 +10,22 @@ namespace PoshCode.Pansies.Palettes
         public ConsolePalette()
         {
             // The ConsolePalette needs to be in the .NET ConsoleColors enum order
-            Add(new RgbColor(0x00, 0x00, 0x00));
-            Add(new RgbColor(0x00, 0x00, 0x80));
-            Add(new RgbColor(0x00, 0x80, 0x00));
-            Add(new RgbColor(0x00, 0x80, 0x80));
-            Add(new RgbColor(0x80, 0x00, 0x00));
-            Add(new RgbColor(0x80, 0x00, 0x80));
-            Add(new RgbColor(0x80, 0x80, 0x00));
-            Add(new RgbColor(0xc0, 0xc0, 0xc0));
-            Add(new RgbColor(0x80, 0x80, 0x80));
-            Add(new RgbColor(0x00, 0x00, 0xff));
-            Add(new RgbColor(0x00, 0xff, 0x00));
-            Add(new RgbColor(0x00, 0xff, 0xff));
-            Add(new RgbColor(0xff, 0x00, 0x00));
-            Add(new RgbColor(0xff, 0x00, 0xff));
-            Add(new RgbColor(0xff, 0xff, 0x00));
-            Add(new RgbColor(0xff, 0xff, 0xff));
+            Add(new RgbColor(0x00, 0x00, 0x00, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x00, 0x00, 0x80, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x00, 0x80, 0x00, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x00, 0x80, 0x80, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x80, 0x00, 0x00, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x80, 0x00, 0x80, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x80, 0x80, 0x00, ColorMode.ConsoleColor));
+            Add(new RgbColor(0xc0, 0xc0, 0xc0, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x80, 0x80, 0x80, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x00, 0x00, 0xff, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x00, 0xff, 0x00, ColorMode.ConsoleColor));
+            Add(new RgbColor(0x00, 0xff, 0xff, ColorMode.ConsoleColor));
+            Add(new RgbColor(0xff, 0x00, 0x00, ColorMode.ConsoleColor));
+            Add(new RgbColor(0xff, 0x00, 0xff, ColorMode.ConsoleColor));
+            Add(new RgbColor(0xff, 0xff, 0x00, ColorMode.ConsoleColor));
+            Add(new RgbColor(0xff, 0xff, 0xff, ColorMode.ConsoleColor));
         }
     }
 }
