@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <Configuration>
   <SelectionSets>
     <SelectionSet>
@@ -152,7 +152,7 @@
           <TableColumnHeader>
             <Width>12</Width>
             <Alignment>Left</Alignment>
-            <Label>ConsoleColor</Label>
+            <Label>TerminalColor</Label>
           </TableColumnHeader>
         </TableHeaders>
         <TableRowEntries>
@@ -160,8 +160,12 @@
             <TableColumnItems>
               <TableColumnItem>
                 <ScriptBlock>
-                  ([PoshCode.Pansies.RgbColor]$_).ToVtEscapeSequence($true) + " $([char]27)[0m " +
-                  ("#{0:X6}" -f ([PoshCode.Pansies.RgbColor]$_).RGB)
+                  $RGB = ([PoshCode.Pansies.RgbColor]$_).RGB
+                  if ($RGB -ge 0) {
+                    $_.ToVtEscapeSequence($true) + " $([char]27)[0m " + ("#{0:X6}" -f $RGB)
+                  } else {
+                    $_.ToVtEscapeSequence($true) + " DEFAULT $([char]27)[0m"
+                  }
                 </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
@@ -179,7 +183,14 @@
                 <ScriptBlock>([PoshCode.Pansies.RgbColor]$_).XTerm256Index</ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
-                <ScriptBlock>([PoshCode.Pansies.RgbColor]$_).ConsoleColor</ScriptBlock>
+                <ScriptBlock>
+                  [PoshCode.Pansies.RgbColor]$RGB = $_
+                  if ($RGB.RGB -ge 0) {
+                    $RGB.TerminalColor
+                  } else {
+                    "Default"
+                  }
+                </ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>

@@ -66,6 +66,11 @@ namespace PoshCode.Pansies.ColorSpaces
 
             for (int i = 0; i < Ordinals.Length; i++)
             {
+                // if any of the ordinals are negative, return "Terminal Default"
+                if (Ordinals[i] < 0)
+                {
+                    return "Terminal Default";
+                }
                 string value;
                 if (Ordinals[i] >= 0 && Ordinals[i] <= 1) {
                     value = Ordinals[i].ToString("N3");

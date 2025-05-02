@@ -578,10 +578,15 @@ namespace PoshCode.Pansies
 
         public override string ToVTEscapeSequence(bool background = false)
         {
-            return string.Format(background ? "\u001B[48;2;{0:n0};{1:n0};{2:n0}m" : "\u001B[38;2;{0:n0};{1:n0};{2:n0}m", R, G, B);
+            return ToVtEscapeSequence(background, _mode);
         }
         public string ToVtEscapeSequence(bool background = false, ColorMode? mode = null)
         {
+            if (RGB < 0) // all negative values output the "default" escape sequence, regardless of color mode
+            {
+                return background ? "\u001B[49m" : "\u001B[39m";
+            }
+
             if (!mode.HasValue)
             {
                 if(_mode != ColorMode.Automatic)
@@ -650,13 +655,7 @@ namespace PoshCode.Pansies
                 case ColorMode.Rgb24Bit:
                 default:
                 {
-                    if (RGB < 0)
-                    {
-                        return background ? "\u001B[49m" : "\u001B[39m";
-                    }
-
-                    var format = string.Format(background ? "\u001B[48;2;{0:n0};{1:n0};{2:n0}m" : "\u001B[38;2;{0:n0};{1:n0};{2:n0}m", R, G, B);
-                    return format;
+                    return string.Format(background ? "\u001B[48;2;{0:n0};{1:n0};{2:n0}m" : "\u001B[38;2;{0:n0};{1:n0};{2:n0}m", R, G, B);
                 }
             }
         }

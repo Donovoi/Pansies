@@ -12,8 +12,6 @@ ARG --global TEST_ROOT=/tests
 ARG --global TEMP_ROOT=/temp
 # These are my common build args, used in my shared /Tasks repo
 ARG --global MODULE_NAME=Pansies
-ARG --global CONFIGURATION=Release
-
 
 worker:
     # Dotnet tools and scripts installed by PSGet
@@ -31,6 +29,7 @@ worker:
     RUN ["pwsh", "-File", "/Tasks/_Bootstrap.ps1"]
 
 build:
+    ARG CONFIGURATION=Release
     FROM +worker
     RUN mkdir $OUTPUT_ROOT $TEST_ROOT $TEMP_ROOT
     COPY . .
