@@ -85,6 +85,7 @@ $global:PansiesColorCompleterRegistration = Register-EngineEvent -SourceIdentifi
     Remove-Variable PansiesColorCompleterRegistration -Scope global
 }
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingCmdletAliases', 'Pansies', Justification = 'This is an exported variable')]
 $Pansies = @{
     color = [RgbColor]::X11Palette
     esc   = [PoshCode.Pansies.Entities]::EscapeSequences

@@ -9,13 +9,15 @@ using System.Text;
 
 namespace PoshCode.Pansies.Commands
 {
-
-
-    [Cmdlet("Expand","Variable")]
+    [Cmdlet("Expand", "Variable", DefaultParameterSetName = "Content")]
     public class ExpandVariableCommand : PSCmdlet
     {
-        [Parameter(Mandatory = true, Position = 0)]
+        [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true, ParameterSetName = "Path")]
+        [Alias("PSPath")]
         public string Path { get; set; }
+
+        [Parameter(Mandatory = true, ValueFromPipeline = true, ParameterSetName = "Content")]
+        public string Content { get; set; }
 
         [Parameter()]
         public SwitchParameter Unescaped { get; set; }
@@ -23,77 +25,98 @@ namespace PoshCode.Pansies.Commands
         [Parameter()]
         public string[] Drive { get; set; } = ["bg", "emoji", "esc", "extra", "fg", "nf"];
 
-        [Parameter()]
+        [Parameter(ParameterSetName = "Path")]
         public SwitchParameter InPlace { get; set; }
 
-        protected override void EndProcessing()
+        [Parameter(ParameterSetName = "Path")]
+        public SwitchParameter Passthru { get; set; }
+
+        protected override void ProcessRecord()
         {
+            if (ParameterSetName == "Content")
+            {
+                var result = ExpandVariable(Content, "Content");
+                WriteObject(result);
+                return;
+            }
+
             var resolvedProviderPath = GetResolvedProviderPathFromPSPath(Path, out ProviderInfo provider);
-            foreach (var file in resolvedProviderPath) {
-                var result = new StringBuilder();
-                var replacements = new List<TextReplacement>();
-                Ast ast = null;
-                string code;
+            foreach (var file in resolvedProviderPath)
+            {
                 string fullName = file;
                 if (provider.Name != "Variable" && provider.Name != "FileSystem" && !fullName.Contains(":"))
                 {
                     fullName = $"{provider.Name}:{file}";
                 }
-                code = GetVariableValue(fullName).ToString();
-                ast = Parser.ParseInput(code, fullName, out var tokens, out var parseErrors);
-                if (parseErrors.Length > 0) {
-                    WriteError(new ErrorRecord(new Exception($"{parseErrors.Length} Parse Errors in {fullName}, cannot expand."), "ParseErrors", ErrorCategory.InvalidOperation, fullName));
-                    continue;
-                }
-                result.AppendLine(code);
+                string code = GetVariableValue(fullName).ToString();
+                var result = ExpandVariable(code, fullName);
 
-                var variables = ast.FindAll(a => a is VariableExpressionAst, true).
-                                    Cast<VariableExpressionAst>().
-                                    Where(v => (!v.VariablePath.IsUnqualified ||    // variable:foo is IsUnqualified = False and IsVariable = True
-                                                v.VariablePath.IsDriveQualified) && // fg:red is IsDriveQualified = True and IsVariable = False
-                                                Drive.Contains(v.VariablePath.DriveName ?? "variable", StringComparer.OrdinalIgnoreCase));
-
-                foreach (var variable in variables)
+                if (result != null)
                 {
-                    try
+                    if (InPlace)
                     {
-                        var replacement = GetVariableValue(variable.VariablePath.UserPath).ToString();
-                        if (!Unescaped)
+                        SessionState.PSVariable.Set(fullName, result);
+                        if (Passthru)
                         {
-                            replacement = replacement.ToPsEscapedString();
-                        }
-                        if (variable.Parent is ExpandableStringExpressionAst)
-                        {
-                            replacements.Add(new TextReplacement(replacement, variable.Extent));
-                        }
-                        else
-                        {
-                            replacements.Add(new TextReplacement('"' + replacement + '"', variable.Extent));
+                            WriteObject(SessionState.InvokeProvider.Item.Get(fullName), true);
                         }
                     }
-                    catch
+                    else
                     {
-                        WriteWarning($"VariableNotFound: '{variable.VariablePath.UserPath}' at {fullName}:{variable.Extent.StartLineNumber}:{variable.Extent.StartColumnNumber}");
-                        continue;
+                        WriteObject(result);
                     }
                 }
+            }
+        }
 
-                foreach (var replacement in replacements.OrderByDescending(r => r.StartOffset))
-                {
-                    result.Remove(replacement.StartOffset, replacement.Length).Insert(replacement.StartOffset, replacement.Text);
-                }
-
-                if (InPlace)
-                {
-                    SessionState.PSVariable.Set(fullName, result.ToString());
-                }
-                else
-                {
-                    WriteObject(result.ToString());
-                }
-
+        private string ExpandVariable(string code, string fullName = null)
+        {
+            var builder = new StringBuilder(code);
+            var replacements = new List<TextReplacement>();
+            Ast ast = null;
+            ast = Parser.ParseInput(code, fullName, out var tokens, out var parseErrors);
+            if (parseErrors.Length > 0)
+            {
+                WriteError(new ErrorRecord(new Exception($"{parseErrors.Length} Parse Errors in {fullName}, cannot expand."), "ParseErrors", ErrorCategory.InvalidOperation, fullName));
+                return null;
             }
 
+            var variables = ast.FindAll(a => a is VariableExpressionAst, true).
+                                Cast<VariableExpressionAst>().
+                                Where(v => (!v.VariablePath.IsUnqualified ||    // variable:foo is IsUnqualified = False and IsVariable = True
+                                            v.VariablePath.IsDriveQualified) && // fg:red is IsDriveQualified = True and IsVariable = False
+                                            Drive.Contains(v.VariablePath.DriveName ?? "variable", StringComparer.OrdinalIgnoreCase));
+
+            foreach (var variable in variables)
+            {
+                try
+                {
+                    var replacement = GetVariableValue(variable.VariablePath.UserPath).ToString();
+                    if (!Unescaped)
+                    {
+                        replacement = replacement.ToPsEscapedString();
+                    }
+                    if (variable.Parent is ExpandableStringExpressionAst)
+                    {
+                        replacements.Add(new TextReplacement(replacement, variable.Extent));
+                    }
+                    else
+                    {
+                        replacements.Add(new TextReplacement('"' + replacement + '"', variable.Extent));
+                    }
+                }
+                catch
+                {
+                    WriteWarning($"VariableNotFound: '{variable.VariablePath.UserPath}' at {fullName}:{variable.Extent.StartLineNumber}:{variable.Extent.StartColumnNumber}");
+                    continue;
+                }
+            }
+
+            foreach (var replacement in replacements.OrderByDescending(r => r.StartOffset))
+            {
+                builder.Remove(replacement.StartOffset, replacement.Length).Insert(replacement.StartOffset, replacement.Text);
+            }
+            return builder.ToString();
         }
 
         private class TextReplacement(string text, IScriptExtent extent)

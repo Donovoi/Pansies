@@ -18,7 +18,7 @@
     <SelectionSet>
       <Name>Grapheme</Name>
       <Types>
-        <TypeName>PoshCode.Pansies.Provider.Grapheme</TypeName>
+        <TypeName>PoshCode.Pansies.Grapheme</TypeName>
       </Types>
     </SelectionSet>
   </SelectionSets>
@@ -35,7 +35,7 @@
             <Label>Name</Label>
           </TableColumnHeader>
           <TableColumnHeader>
-            <Label>Entity</Label>
+            <Label>Value</Label>
           </TableColumnHeader>
         </TableHeaders>
         <TableRowEntries>
@@ -61,7 +61,9 @@
         <WideEntries>
           <WideEntry>
             <WideItem>
-              <PropertyName>Value</PropertyName>
+              <ScriptBlock>
+                $_.Value + " " + $_.Name
+              </ScriptBlock>
             </WideItem>
           </WideEntry>
         </WideEntries>
