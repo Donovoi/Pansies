@@ -11,7 +11,7 @@ using CodeOwls.PowerShell.Provider;
 namespace PoshCode.Pansies.Provider
 {
     [CmdletProvider("Pansies", ProviderCapabilities.None)]
-    public class EntityProvider : CodeOwls.PowerShell.Provider.Provider
+    public class PansiesProvider : CodeOwls.PowerShell.Provider.Provider
     {
         /// <summary>
         /// a required P2F override
@@ -25,12 +25,12 @@ namespace PoshCode.Pansies.Provider
 
         protected override IPathResolver PathResolver2(string path)
         {
-            var name = path.Split([System.IO.Path.DirectorySeparatorChar, System.IO.Path.PathSeparator], StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            var name = path.Split([System.IO.Path.DirectorySeparatorChar, ':', System.IO.Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
             var drive = (from driveInfo in ProviderInfo.Drives
-                        where StringComparer.OrdinalIgnoreCase.Equals(driveInfo.Root.Trim('\\'), name)
-                        select driveInfo).FirstOrDefault() as Drive;
+                         where StringComparer.OrdinalIgnoreCase.Equals(driveInfo.Root.Trim(System.IO.Path.DirectorySeparatorChar, ':', System.IO.Path.AltDirectorySeparatorChar), name)
+                         select driveInfo).FirstOrDefault() as Drive;
 
-            return drive.PathResolver ?? new PansiesResolver(() => new PansiesProviderRoot());
+            return drive.PathResolver ?? new PathNodeResolver(() => new PansiesProviderRoot());
         }
         /// <summary>
         /// overridden to supply a default drive when the provider is loaded
@@ -40,35 +40,35 @@ namespace PoshCode.Pansies.Provider
             var drives = new Collection<PSDriveInfo>
             {
                 new PansiesDrive (
-                    new PSDriveInfo( "Fg", ProviderInfo, "ForegroundColors:" + System.IO.Path.DirectorySeparatorChar, "Foreground Colors", null, "Fg:" ),
-                    new PansiesResolver(() => new RgbColorProviderRoot(RgbColorMode.Foreground))
+                    new PSDriveInfo( "fg", ProviderInfo, "fg:" + System.IO.Path.DirectorySeparatorChar, "Foreground Colors", null, "Fg:" ),
+                    new PathNodeResolver(() => new RgbColorProviderRoot(RgbColorMode.Foreground))
                 ),
                 new PansiesDrive(
-                    new PSDriveInfo( "Bg", ProviderInfo, "BackgroundColors:" + System.IO.Path.DirectorySeparatorChar, "Background Colors", null, "Bg:" ),
-                    new PansiesResolver(() => new RgbColorProviderRoot(RgbColorMode.Background))
+                    new PSDriveInfo( "bg", ProviderInfo, "bg:" + System.IO.Path.DirectorySeparatorChar, "Background Colors", null, "Bg:" ),
+                    new PathNodeResolver(() => new RgbColorProviderRoot(RgbColorMode.Background))
                 ),
                 new PansiesDrive(
-                    new PSDriveInfo( "Esc", ProviderInfo, "EscapeSequences:" + System.IO.Path.DirectorySeparatorChar, "Escape Sequences", null, "Esc:" ),
-                    new PansiesResolver(() => Entities.EscapeSequences.ToDriveRoot("Esc"))
+                    new PSDriveInfo( "esc", ProviderInfo, "esc:" + System.IO.Path.DirectorySeparatorChar, "Escape Sequences", null, "Esc:" ),
+                    new PathNodeResolver(() => Entities.EscapeSequences.ToDriveRoot("esc"))
                 ),
                 new PansiesDrive(
-                    new PSDriveInfo( "Extra", ProviderInfo, "Strings:" + System.IO.Path.DirectorySeparatorChar, "Named Extended Strings", null, "Extra:" ),
-                    new PansiesResolver(() => Entities.ExtendedCharacters.ToDriveRoot("Extra"))
+                    new PSDriveInfo( "extra", ProviderInfo, "extra:" + System.IO.Path.DirectorySeparatorChar, "Named Extended Strings", null, "Extra:" ),
+                    new PathNodeResolver(() => Entities.ExtendedCharacters.ToDriveRoot("extra"))
                 ),
             };
             if (Entities.EnableNerdFonts) {
                 drives.Add(
                     new PansiesDrive(
-                        new PSDriveInfo( "NF", ProviderInfo, "NerdFontSymbols:" + System.IO.Path.DirectorySeparatorChar, "NerdFont Symbols", null, "NF:" ),
-                        new PansiesResolver(() => Entities.NerdFontSymbols.ToDriveRoot("Extra"))
+                        new PSDriveInfo("nf", ProviderInfo, "nf:" + System.IO.Path.DirectorySeparatorChar, "NerdFont Symbols", null, "NF:"),
+                        new PathNodeResolver(() => Entities.NerdFontSymbols.ToDriveRoot("nf"))
                     )
                 );
             }
             if (Entities.EnableEmoji) {
                 drives.Add(
                     new PansiesDrive(
-                        new PSDriveInfo( "Emoji", ProviderInfo, "Emoji:" + System.IO.Path.DirectorySeparatorChar, "Emoji 16", null, "Emoji:" ),
-                        new PansiesResolver(() => Entities.Emoji.ToDriveRoot("Extra"))
+                        new PSDriveInfo("emoji", ProviderInfo, "emoji:" + System.IO.Path.DirectorySeparatorChar, "Emoji 16", null, "Emoji:"),
+                        new PathNodeResolver(() => Entities.Emoji.ToDriveRoot("emoji"))
                     )
                 );
             };

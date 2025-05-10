@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Management.Automation;
 using System.Net;
 using System.Text;
+using CodeOwls.PowerShell.Paths.Processors;
 
 namespace PoshCode.Pansies
 {
@@ -60,7 +62,7 @@ namespace PoshCode.Pansies
             var output = new StringBuilder(stop);
 
             int end = 0, start = 0;
-            while((start = value.IndexOf('&', end)) != -1)
+            while ((start = value.IndexOf('&', end)) != -1)
             {
                 // if it's at the end, we're done here
                 if (start == value.Length - 1)

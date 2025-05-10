@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace PoshCode.Pansies.Provider
 {
-    class PansiesResolver(Func<IPathNode> RootFactory) : PathResolverBase
+    class PathNodeResolver(Func<IPathNode> RootFactory) : PathResolverBase
     {
         private readonly Func<IPathNode> rootFactory = RootFactory;
 

@@ -1,23 +1,27 @@
 ﻿using CodeOwls.PowerShell.Paths;
 using CodeOwls.PowerShell.Provider.PathNodeProcessors;
 using CodeOwls.PowerShell.Provider.PathNodes;
-using PoshCode.Pansies.Palettes;
+using PoshCode.Pansies.Provider;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Management.Automation.Provider;
 using System.Text;
-using PoshCode.Pansies;
 
-namespace PoshCode.Pansies.Provider
+namespace PoshCode.Pansies
 {
     public class Grapheme : PathNodeBase, IGetItemContent //, ISetItemContent
     {
         private string name;
         public string Value { get; set; }
 
+        /// <summary>
+        /// supplies the name for the item at the current path value
+        /// </summary>
+        public override string Name
+        {
+            get { return name; }
+        }
 
         public Grapheme(KeyValuePair<string, string> item)
         {
@@ -56,12 +60,14 @@ namespace PoshCode.Pansies.Provider
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// supplies the name for the item at the current path value
-        /// </summary>
-        public override string Name
+
+        public IEnumerable<int> ToUTF32()
         {
-            get { return name; }
+            return Value.ToUTF32();
+        }
+        public string ToPsEscapedString()
+        {
+            return Value.ToPsEscapedString();
         }
     }
 }
