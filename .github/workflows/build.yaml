@@ -25,7 +25,7 @@ jobs:
       run: earthly --strict +test
 
     - name: earthly +push
-      if: github.ref == 'refs/heads/main'
+      # if: github.ref == 'refs/heads/main'
       run: earthly --push --secret NUGET_API_KEY --secret PSGALLERY_API_KEY --strict +all
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
