@@ -22,11 +22,11 @@ namespace PoshCode.Pansies.Provider
             {
                 if (mode == RgbColorMode.Background)
                 {
-                    Content = "\u001B[49m";
+                    Content = "\e[49m";
                 }
                 else
                 {
-                    Content = "\u001B[39m";
+                    Content = "\e[39m";
                 }
             }
             else

@@ -21,7 +21,7 @@ namespace PoshCode.Pansies.Palettes
 
             foreach (var name in names.Where(wildcard.IsMatch))
             {
-                yield return new CompletionResult(name.ToString(), nativeColors[names.IndexOf(name)].ToVTEscapeSequence(true) + " \u001B[0m " + name, CompletionResultType.ParameterValue, name);
+                yield return new CompletionResult(name.ToString(), nativeColors[names.IndexOf(name)].ToVTEscapeSequence(true) + " \e[0m " + name, CompletionResultType.ParameterValue, name);
             }
         }
 

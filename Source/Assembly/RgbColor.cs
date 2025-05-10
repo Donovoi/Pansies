@@ -584,7 +584,7 @@ namespace PoshCode.Pansies
         {
             if (RGB < 0) // all negative values output the "default" escape sequence, regardless of color mode
             {
-                return background ? "\u001B[49m" : "\u001B[39m";
+                return background ? "\e[49m" : "\e[39m";
             }
 
             if (!mode.HasValue)
@@ -610,52 +610,52 @@ namespace PoshCode.Pansies
                     switch (TerminalColor)
                     {
                         case "Black":
-                            return background ? "\u001B[40m" : "\u001B[30m";
+                            return background ? "\e[40m" : "\e[30m";
                         case "Red":
-                            return background ? "\u001B[41m" : "\u001B[31m";
+                            return background ? "\e[41m" : "\e[31m";
                         case "Green":
-                            return background ? "\u001B[42m" : "\u001B[32m";
+                            return background ? "\e[42m" : "\e[32m";
                         case "Yellow":
-                            return background ? "\u001B[43m" : "\u001B[33m";
+                            return background ? "\e[43m" : "\e[33m";
                         case "Blue":
-                            return background ? "\u001B[44m" : "\u001B[34m";
+                            return background ? "\e[44m" : "\e[34m";
                         case "Magenta":
-                            return background ? "\u001B[45m" : "\u001B[35m";
+                            return background ? "\e[45m" : "\e[35m";
                         case "Cyan":
-                            return background ? "\u001B[46m" : "\u001B[36m";
+                            return background ? "\e[46m" : "\e[36m";
                         case "White":
-                            return background ? "\u001B[47m" : "\u001B[37m";
+                            return background ? "\e[47m" : "\e[37m";
                         case "BrightBlack":
-                            return background ? "\u001B[100m" : "\u001B[90m";
+                            return background ? "\e[100m" : "\e[90m";
                         case "BrightRed":
-                            return background ? "\u001B[101m" : "\u001B[91m";
+                            return background ? "\e[101m" : "\e[91m";
                         case "BrightGreen":
-                            return background ? "\u001B[102m" : "\u001B[92m";
+                            return background ? "\e[102m" : "\e[92m";
                         case "BrightYellow":
-                            return background ? "\u001B[103m" : "\u001B[93m";
+                            return background ? "\e[103m" : "\e[93m";
                         case "BrightBlue":
-                            return background ? "\u001B[104m" : "\u001B[94m";
+                            return background ? "\e[104m" : "\e[94m";
                         case "BrightMagenta":
-                            return background ? "\u001B[105m" : "\u001B[95m";
+                            return background ? "\e[105m" : "\e[95m";
                         case "BrightCyan":
-                            return background ? "\u001B[106m" : "\u001B[96m";
+                            return background ? "\e[106m" : "\e[96m";
                         case "BrightWhite":
-                            return background ? "\u001B[107m" : "\u001B[97m";
+                            return background ? "\e[107m" : "\e[97m";
                         default:
-                            return background ? "\u001B[49m" : "\u001B[39m";
+                            return background ? "\e[49m" : "\e[39m";
                     }
                 }
 
                 case ColorMode.XTerm256:
                 {
-                    var format = string.Format(background ? "\u001B[48;5;{0}m" : "\u001B[38;5;{0}m", XTerm256Index);
+                    var format = string.Format(background ? "\e[48;5;{0}m" : "\e[38;5;{0}m", XTerm256Index);
                     return format;
                 }
 
                 case ColorMode.Rgb24Bit:
                 default:
                 {
-                    return string.Format(background ? "\u001B[48;2;{0:n0};{1:n0};{2:n0}m" : "\u001B[38;2;{0:n0};{1:n0};{2:n0}m", R, G, B);
+                    return string.Format(background ? "\e[48;2;{0:n0};{1:n0};{2:n0}m" : "\e[38;2;{0:n0};{1:n0};{2:n0}m", R, G, B);
                 }
             }
         }
@@ -731,8 +731,8 @@ namespace PoshCode.Pansies
             int b = color & 0xff;
 
             return string.Format(background ?
-                "\u001B[48;2;{0:n0};{1:n0};{2:n0}m" :
-                "\u001B[38;2;{0:n0};{1:n0};{2:n0}m",
+                "\e[48;2;{0:n0};{1:n0};{2:n0}m" :
+                "\e[38;2;{0:n0};{1:n0};{2:n0}m",
                 r, g, b);
         }
     }

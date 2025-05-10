@@ -138,7 +138,7 @@ namespace PoshCode.Pansies.ColorSpaces
         public virtual string ToVTEscapeSequence(bool background = false)
         {
             var rgb = ToRgb();
-            return string.Format(background ? "\u001B[48;2;{0:n0};{1:n0};{2:n0}m" : "\u001B[38;2;{0:n0};{1:n0};{2:n0}m", rgb.R, rgb.G, rgb.B);
+            return string.Format(background ? "\e[48;2;{0:n0};{1:n0};{2:n0}m" : "\e[38;2;{0:n0};{1:n0};{2:n0}m", rgb.R, rgb.G, rgb.B);
         }
     }
 }

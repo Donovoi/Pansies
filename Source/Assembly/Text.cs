@@ -9,7 +9,7 @@ namespace PoshCode.Pansies
 {
     public class Text : IEquatable<Text>
     {
-        private Regex _escapeCode = new Regex("\u001B\\P{L}+\\p{L}", RegexOptions.Compiled);
+        private Regex _escapeCode = new Regex("\e\\P{L}+\\p{L}", RegexOptions.Compiled);
 
         /// <summary>
         /// Gets or sets the object.
@@ -219,12 +219,12 @@ namespace PoshCode.Pansies
                 if (null != background)
                 {
                     // clear background
-                    output.Append("\u001B[49m");
+                    output.Append("\e[49m");
                 }
                 if (null != foreground)
                 {
                     // clear foreground
-                    output.Append("\u001B[39m");
+                    output.Append("\e[39m");
                 }
             }
 
