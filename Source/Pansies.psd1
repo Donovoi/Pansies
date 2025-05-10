@@ -46,7 +46,7 @@ FunctionsToExport = @()
 # DefaultCommandPrefix = "Pansies"
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = @('New-Text', 'New-Hyperlink', 'Write-Host', 'Get-Gradient', 'Get-Complement', 'Get-ColorWheel')
+    CmdletsToExport      = @('New-Text', 'New-Hyperlink', 'Write-Host', 'Get-Gradient', 'Get-Complement', 'Get-ColorWheel', 'Get-CursorPosition', 'Set-CursorPosition', 'Save-CursorPosition', 'Restore-CursorPosition', 'Expand-Variable')
 
 # Variables to export from this module
 VariablesToExport = 'RgbColorCompleter', 'Pansies'

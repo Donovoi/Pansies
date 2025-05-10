@@ -61,7 +61,7 @@ namespace PoshCode.Pansies.Commands
                 Object = Uri;
             }
 
-            Object = $"\u001B]8;;{Uri}\a{Object}\u001B]8;;\a";
+            Object = $"\e]8;;{Uri}\a{Object}\e]8;;\a";
 
             var result = new Text()
             {
