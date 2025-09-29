@@ -34,7 +34,7 @@ namespace PoshCode.Pansies
             {
                 if (char.IsHighSurrogate(value[i]))
                 {
-                    if (value.Length < i + 2 || !char.IsLowSurrogate(value[i + 1]))
+                    if (value.Length <= i + 1 || !char.IsLowSurrogate(value[i + 1]))
                     {
                         throw new InvalidDataException("High surrogate must be followed by a low surrogate.");
                     }
