@@ -290,7 +290,7 @@ namespace PoshCode.Pansies
 
             if (xTermIndex[0] == 'x' || xTermIndex[0] == 'X')
             {
-                if (xTermIndex.Length > 1 && (xTermIndex[1] == 't' || xTermIndex[1] == 'T'))
+                if (s.StartsWith("xt", StringComparison.OrdinalIgnoreCase))
                 {
                     xTermIndex = xTermIndex.Substring(2);
                 }
@@ -766,3 +766,4 @@ namespace PoshCode.Pansies
         }
     }
 }
+
