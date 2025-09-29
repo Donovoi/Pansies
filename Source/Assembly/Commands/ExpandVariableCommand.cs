@@ -24,6 +24,19 @@ namespace PoshCode.Pansies.Commands
         [Parameter]
         public SwitchParameter Unescaped { get; set; }
 
+        /// <summary>
+        /// Specifies which drives to use for variable expansion. Each drive represents a different source or type of variable:
+        /// <list type="bullet">
+        /// <item><term>bg</term><description>Background color variables.</description></item>
+        /// <item><term>emoji</term><description>Emoji variables.</description></item>
+        /// <item><term>esc</term><description>Escape sequence variables.</description></item>
+        /// <item><term>extra</term><description>Extra or custom variables.</description></item>
+        /// <item><term>fg</term><description>Foreground color variables.</description></item>
+        /// <item><term>nf</term><description>Nerd Font icon variables.</description></item>
+        /// <item><term>variable</term><description>Standard PowerShell variables.</description></item>
+        /// </list>
+        /// By specifying one or more drives, you control which sources are used during variable expansion.
+        /// </summary>
         [Parameter]
         public string[] Drive { get; set; } = new[] { "bg", "emoji", "esc", "extra", "fg", "nf", "variable" };
 
